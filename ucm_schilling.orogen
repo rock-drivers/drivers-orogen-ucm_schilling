@@ -1,0 +1,39 @@
+name "ucm_schilling"
+# Optionally declare the version number
+# version "0.1"
+
+using_library "ucm_schilling"
+import_types_from "ucm_schilling/UcmTypes.hpp"
+import_types_from "ucm_schilling/Config.hpp"
+
+using_library "aggregator"
+import_types_from 'aggregator'
+
+using_task_library "iodrivers_base"
+
+# Declare a new task context (i.e., a component)
+#
+# The corresponding C++ class can be edited in tasks/Task.hpp and
+# tasks/Task.cpp, and will be put in the ucm_schilling namespace.
+task_context "Task" do
+    subclasses "iodrivers_base::Task"
+    needs_configuration
+    
+    error_states :COMM_ERROR
+    
+    property "config", "ucm_schilling/Config"
+    
+    output_port "ucm_samples", "ucm_schilling/UcmData"
+    periodic(0.2)
+end
+
+
+# Declares a deployment, i.e. an actual executable that contains various tasks.
+deployment "ucm_schilling_test" do
+    # This is a test deployment that should not be installed
+    do_not_install
+
+    # Declares it as periodic, with a period of 100ms
+    task("ucm_schilling", "ucm_schilling::Task")
+    add_default_logger
+end
