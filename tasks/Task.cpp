@@ -2,6 +2,8 @@
 
 #include "Task.hpp"
 #include <ucm_schilling/Driver.hpp>
+#include <base/logging.h>
+
 using namespace ucm_schilling;
 
 Task::Task(std::string const& name)
@@ -44,7 +46,7 @@ Task::~Task()
 	  return false;
       return true;
     } catch(std::runtime_error &e){
-      cout <<"exception " <<e.what() <<endl;
+      LOG_DEBUG("exception %s",e.what());
       error(COMM_ERROR);      
     }
  }
@@ -52,12 +54,11 @@ Task::~Task()
  bool Task::startHook()
  {
     try{
-      cout <<"startHook" <<endl; 
       if (! TaskBase::startHook())
 	  return false;
       return true;
     } catch(std::runtime_error &e){
-      cout <<"exception " <<e.what() <<endl;
+      LOG_DEBUG("exception %s",e.what());
       error(COMM_ERROR);      
     }
  }
@@ -65,32 +66,28 @@ Task::~Task()
  void Task::updateHook()
  {
     try{
-      cout <<"updateHook" <<endl; 
       mDriver->collectData();
       _ucm_samples.write(mDriver->getData());
       TaskBase::updateHook();
     } catch(std::runtime_error &e){
-      cout <<"exception " <<e.what() <<endl;
+      LOG_DEBUG("exception %s",e.what());
       error(COMM_ERROR);      
     }
  }
  
  void Task::errorHook()
  {
-   cout <<"errorHook" <<endl;   
    TaskBase::errorHook();
    recover();
  }
 
  void Task::stopHook()
  {
-   cout <<"stopHook" <<endl;   
    TaskBase::stopHook();
  }
 
 void Task::cleanupHook()
 {
-    cout <<"cleanupHook" <<endl; 
     if(mDriver){
       mDriver->close();
     }

@@ -44,12 +44,12 @@ Orocos.run 'ucm_schilling::Task' => 'ucm' do
         task_inspector.show
         Vizkit.exec
     else
-#        reader = ctd.ctd_samples.reader
-#        Orocos.watch(ctd) do
-#            if sample = reader.read
-#                pp sample
-#            end
-#        end
+	reader = ucm.ucm_samples.reader
+        Orocos.watch(ucm) do
+            if sample = reader.read
+                pp sample
+            end
+        end
     end
 end
 
