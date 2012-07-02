@@ -104,6 +104,8 @@ namespace ucm_schilling {
          * before calling start() again.
          */
          void cleanupHook();
+	 
+	 void statusCheck(const UcmStatus& status);
     };
 }
 
