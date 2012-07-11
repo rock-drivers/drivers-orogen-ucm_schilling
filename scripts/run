@@ -11,8 +11,9 @@ optparse = OptionParser.new do |opt|
         gui = true
     end
 end
-io_port = *optparse.parse(ARGV)
-if !io_port
+
+dev_id = *optparse.parse(ARGV)
+if !dev_id
     puts optparse
     exit 1
 end
@@ -22,19 +23,13 @@ if gui
 end
 
 Orocos.run 'ucm_schilling::Task' => 'ucm' do
-#Orocos.run 'ctd_seabird_test' do
     Orocos.logger.level = Logger::DEBUG
     Orocos.log_all
     puts "deployed the ucm_schilling::Task task"
 
     ucm = Orocos::TaskContext.get 'ucm'
-    ucm.io_port = io_port
     ucm.io_read_timeout = Time.at(2);
-    ucm.config do |p|
-        p.count0 = 1000;
-	p.count50 = 2000;
-	p.count100 = 3000;
-    end
+    Orocos.apply_conf_file(ucm, 'ucm.yml', [dev_id])
     ucm.configure
     ucm.start
 
