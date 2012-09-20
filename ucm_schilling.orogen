@@ -5,7 +5,7 @@ name "ucm_schilling"
 using_library "ucm_schilling"
 import_types_from "ucm_schilling/UcmTypes.hpp"
 import_types_from "ucm_schilling/Config.hpp"
-import_types_from "act_schilling/Error.hpp"
+import_types_from "base_schilling/Error.hpp"
 
 using_library "aggregator"
 import_types_from 'aggregator'
