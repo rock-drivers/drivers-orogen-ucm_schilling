@@ -16,5 +16,5 @@
   <depend package="drivers/orogen/iodrivers_base" />
   <depend package="drivers/orogen/aggregator" />
   <depend package="drivers/ucm_schilling" />
-  <depend package="drivers/act_schilling" />
+  <depend package="drivers/base_schilling" />
 </package>
