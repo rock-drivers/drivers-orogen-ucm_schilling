@@ -106,6 +106,10 @@ namespace ucm_schilling {
          void cleanupHook();
 	 
 	 void statusCheck(const UcmStatus& status);
+	 
+	 void processIO();
+	 
+	 void run();
     };
 }
 

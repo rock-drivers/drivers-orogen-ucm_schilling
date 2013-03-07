@@ -34,57 +34,38 @@ Task::~Task()
 // hooks defined by Orocos::RTT. See Task.hpp for more detailed
 // documentation about them.
 
- bool Task::configureHook()
- {
-    try{
-      delete mDriver;
-      ucm_schilling::Config configuration = _config.get();
-      mDriver = new ucm_schilling::Driver(configuration);
-      if (!_io_port.get().empty())
-      {
-	  mDriver->open(_io_port.get());
-      }
+bool Task::configureHook()
+{
+  delete mDriver;
+  ucm_schilling::Config configuration = _config.get();
+  mDriver = new ucm_schilling::Driver(configuration);
+  if (!_io_port.get().empty())
+  {
+    mDriver->open(_io_port.get());
+  }
+  setDriver(mDriver);
 
-      setDriver(mDriver);
-  
-      if (! TaskBase::configureHook())
-	  return false;
-      return true;
-    } catch(std::runtime_error &e){
-      LOG_DEBUG("exception %s",e.what());
-      error(COMM_ERROR);      
-    }
- }
+  if (! TaskBase::configureHook())
+    return false;
+  return true;
+}
 
  bool Task::startHook()
  {
-    try{
-      if (! TaskBase::startHook())
-	  return false;
-      return true;
-    } catch(std::runtime_error &e){
-      LOG_DEBUG("exception %s",e.what());
-      error(COMM_ERROR);      
-    }
+    if (! TaskBase::startHook())
+	return false;
+    return true;
  }
 
  void Task::updateHook()
  {
-    try{
-      mDriver->collectData();
-      _ucm_samples.write(mDriver->getData());
-      statusCheck(mDriver->getStatus());
-      TaskBase::updateHook();
-    } catch(std::runtime_error &e){
-      LOG_DEBUG("exception %s",e.what());
-      error(COMM_ERROR);      
-    }
+   run();
  }
  
  void Task::errorHook()
  {
+   run();
    TaskBase::errorHook();
-   recover();
  }
 
  void Task::stopHook()
@@ -102,17 +83,60 @@ void Task::cleanupHook()
 
 void Task::statusCheck(const UcmStatus& status)
 {
+  bool bDevError = false;
   if(status.status & UCM_STAT_FAIL_EEPROM){
     _log_message.write(LogMessage(Alarm, UCMSTR_EEPROM, UCMALARM_EEPROM));
+    bDevError = true;
   }
 #ifdef ACT_UCM_AD
   if(status.status & UCM_STAT_FAIL_AD){
     _log_message.write(LogMessage(Alarm, UCMSTR_AD, UCMALARM_AD));
+    bDevError = true;
   }
 #endif
 #ifdef ACT_UCM_DA
   if(status.status & UCM_STAT_FAIL_DA){
     _log_message.write(LogMessage(Alarm, UCMSTR_DA, UCMALARM_DA));
+    bDevError = true;
   }
 #endif
+  if(bDevError){
+    error(DEV_ERROR);
+  }
+  else{
+    if(DEV_ERROR == state()){
+      recover();
+    }
+  }
 }
+
+void Task::processIO()
+{
+  mDriver->collectData();
+  _ucm_samples.write(mDriver->getData());
+  statusCheck(mDriver->getStatus());
+}
+
+void Task::run()
+{
+    try{
+      switch(state()){
+	case RUNNING: {
+	  processIO();
+	  state(MONITORING);
+	  break;
+	}
+	case MONITORING:{
+	  processIO();
+	  break;
+	}
+	default: break;
+      }      
+    } catch(std::runtime_error &e){
+      LOG_DEBUG("exception %s",e.what());
+      _log_message.write(LogMessage(e));
+      exception(IO_TIMEOUT);  
+    }
+
+}
+
