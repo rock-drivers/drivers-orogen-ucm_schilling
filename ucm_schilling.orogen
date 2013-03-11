@@ -22,6 +22,7 @@ task_context "Task" do
     property "config", "ucm_schilling/Config"
     
     output_port "ucm_samples", "ucm_schilling/UcmData"
+    output_port "ucm_status", "ucm_schilling/UcmStatus"
     output_port('log_message', 'oro_marum/LogMessage').
         doc 'TextMessage with different priority levels'
     periodic(0.2)

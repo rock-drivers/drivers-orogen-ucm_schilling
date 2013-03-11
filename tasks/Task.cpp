@@ -114,7 +114,9 @@ void Task::processIO()
 {
   mDriver->collectData();
   _ucm_samples.write(mDriver->getData());
-  statusCheck(mDriver->getStatus());
+  UcmStatus status = mDriver->getStatus();
+  statusCheck(status);
+  _ucm_status.write(status);
 }
 
 void Task::run()
