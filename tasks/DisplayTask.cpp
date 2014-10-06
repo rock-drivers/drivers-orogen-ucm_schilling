@@ -56,6 +56,8 @@ bool DisplayTask::configureHook()
 
  bool DisplayTask::startHook()
  {
+	mDriver->setReadTimeout(_io_read_timeout.get());
+	mDriver->setWriteTimeout(_io_write_timeout.get());
     if (! DisplayTaskBase::startHook())
 	return false;
     return true;
