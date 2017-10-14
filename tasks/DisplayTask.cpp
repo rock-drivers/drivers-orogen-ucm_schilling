@@ -4,7 +4,7 @@
 #include <ucm_schilling/Driver.hpp>
 #include <ucm_schilling/UcmRaw.hpp>
 #include <base_schilling/Error.hpp>
-#include <base/Logging.hpp>
+#include <base-logging/Logging.hpp>
 
 #define ACT_UCM_AD
 
